@@ -1,3 +1,7 @@
+/** @file
+ *  @brief Source file for a (dummy) ADC driver.
+ */
+
 #include "adc_driver.h"
 
 #include <stdio.h>

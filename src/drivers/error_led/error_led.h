@@ -1,3 +1,7 @@
+/** @file
+ *  @brief Header file for a (dummy) error LED driver.
+ */
+
 #ifndef ERROR_LED_ERROR_LED_H_
 #define ERROR_LED_ERROR_LED_H_
 

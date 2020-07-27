@@ -1,3 +1,7 @@
+/** @file
+ *  @brief Source file for a (dummy) error LED driver.
+ */
+
 #include "error_led.h"
 
 #include <stdio.h>

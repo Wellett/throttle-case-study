@@ -1,3 +1,6 @@
+/** @file
+ *  @brief Header file for a (dummy) ADC driver.
+ */
 #ifndef DRIVERS_ADC_DRIVER_ADC_DRIVER_H_
 #define DRIVERS_ADC_DRIVER_ADC_DRIVER_H_
 
