@@ -50,3 +50,15 @@ Please note:
 was a real-life task and you would have more time, then please write that down in doc/mainpage.dox.
 - We are not interested in code that creates/schedules RTOS tasks or something like that. Briefly explain verbally how you believe that should work in the documentation and in src/main.c put some code that demonstrates your code a bit.
 - If you don’t have doxygen installed or are struggling with it (for example because it’s new for you), don’t worry too much about how the html is generated. We can have a look at the .dox file itself as well.
+
+## Notes on Installation
+To use doxygen documentation generation, both doxygen and dot should be installed
+`sudo apt install doxygen`
+`sudo apt install graphviz`
+
+
+
+
+
+
+
