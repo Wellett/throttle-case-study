@@ -10,6 +10,7 @@
 #include "drivers/adc_driver/adc_driver.h"
 #include "drivers/error_led/error_led.h"
 #include "modules/sensors.h"
+#include "modules/moving_average.h"
 
 int main(int argc, char *argv[]) {
   adc_value_t value = 0;
@@ -30,6 +31,26 @@ int main(int argc, char *argv[]) {
 
   adc_read_set_output(ADC_CHANNEL0, 716, ADC_RET_OK);
   printf("Angle sensor 0 angle: %.2f\n", read_angle_sensor(&sensor0));
+
+  filter_t ma_filter;
+  double data[3];
+  moving_average_filter_init(&ma_filter, data, 3);
+  
+  ma_filter.feed(&ma_filter, 3);
+  printf("ma filter read: %f\n", ma_filter.read(&ma_filter));
+  ma_filter.feed(&ma_filter, 3.5);
+  printf("ma filter read: %f\n", ma_filter.read(&ma_filter));
+  ma_filter.feed(&ma_filter, 4.0);
+  printf("ma filter read: %f\n", ma_filter.read(&ma_filter));
+  ma_filter.feed(&ma_filter, 4.5);
+  printf("ma filter read: %f\n", ma_filter.read(&ma_filter));
+  ma_filter.feed(&ma_filter, 3.0);
+  printf("ma filter read: %f\n", ma_filter.read(&ma_filter));
+  ma_filter.feed(&ma_filter, 3.0);
+  printf("ma filter read: %f\n", ma_filter.read(&ma_filter));
+  ma_filter.feed(&ma_filter, 3.0);
+  printf("ma filter read: %f\n", ma_filter.read(&ma_filter));
+
 
   error_led_set(true);
 }
