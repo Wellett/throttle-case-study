@@ -6,6 +6,7 @@
 
 //TODO use a build system that does not require aboslute paths...
 #include "../drivers/adc_driver/adc_driver.h"
+#include "../drivers/error_led/error_led.h"
 #include "moving_average.h"
 
 typedef enum {

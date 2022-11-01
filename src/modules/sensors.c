@@ -71,6 +71,7 @@ static void init_angle_sensor(angle_sensor_t *sensor, adc_channel_id_t
     if (adc_init(adc_channel) != ADC_RET_OK){
         printf("[SENSOR] Error: sensor not initialised successfully\n");
         sensor->state = SENSOR_FAULT;
+        error_led_set(true);
         //TODO trigger error system
     }
     sensor->state = SENSOR_OK;
@@ -90,6 +91,7 @@ double combined_angle_sensor_reading(angle_sensor_t *sensors) {
     }
     if (count == 0 ) {
         //No sensors operational. Trigger a critical error!
+        error_led_set(true);
     }
     return sum/count;
 }
@@ -115,6 +117,7 @@ static double read_angle_sensor(angle_sensor_t *sensor) {
     if (adc_read(sensor->adc_channel, &adc_value) != ADC_RET_OK) {
         printf("[SENSOR] Error: adc read unsuccessful\n");
         sensor->state = SENSOR_FAULT;
+        error_led_set(true);
         //TODO trigger error system
     }
 
@@ -148,6 +151,7 @@ static double read_adc_voltage(adc_value_t adc, uint16_t adc_max,
         double voltage_range) {
     if (adc > adc_max) {
         printf("[SENSOR] Error ADC out of bounds\n");
+        error_led_set(true);
         //TODO: trigger error system here
     }
     return adc*voltage_range/adc_max;

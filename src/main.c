@@ -47,8 +47,6 @@ int main(int argc, char *argv[]) {
     printf("[MAIN] Test point sensor failure\n");
     adc_read_set_output(ADC_CHANNEL0, 409, ADC_RET_NOK);
     sensors_task();
-
-    error_led_set(true);
 }
 
 
