@@ -18,12 +18,21 @@
   ![Some image](doc/a.png)
 -->
 
+@Assumptions 
+- The microcontrollers are assumed to operate over a 5V range. Since the adc driver actually outputs 
+the 10-bit adc value, a voltage range must be assumed to calculate the voltage read. This is 
+parameterised by ADC_VOLTAGE
+    - This is a reasonable assumption given both sensors require >3.3V for the full sensor range. 
+
 @section remarks Remarks and suggestions
 
 Recommendation to the systems team: for true redundancy I recommend using 3 angular sensors. 3 
 sensors allows for easy error detection, (and identifiection of the faulty sensor) for a greature 
 range of failure modes.
 
-A more general approach to this problem might should allow for multiple cascaded maps.
+A more general approach to this problem might should allow for multiple cascaded maps, as the 
+throttle response will likely be scaled by more values than just speed.
+
+
 
 */
