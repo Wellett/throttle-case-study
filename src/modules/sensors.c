@@ -15,32 +15,41 @@
 #define SENSOR2_OFFSET  -12.5 
 #define FILTER_LEN      10
 
+#define NUM_SENSORS 2
+
 /* Function Declarations */
+static void init_angle_sensor(angle_sensor_t *sensor, adc_channel_id_t 
+        adc_channel, sensor_map_f map, double* buffer);
 static double read_adc_voltage(adc_value_t adc, uint16_t adc_max, 
         double voltage_range);
 static void angle_sensor_update(angle_sensor_t *sensor);
-static void init_angle_sensor(angle_sensor_t *sensor, 
-        adc_channel_id_t adc_channel, sensor_map_f map);
 static double read_angle_sensor(angle_sensor_t *sensor);
 static double angle_sensor_1_characteristic_map(double voltage);
 static double angle_sensor_2_characteristic_map(double voltage);
+double combined_angle_sensor_reading(angle_sensor_t *sensors);
 
 /* Sensors */
-static angle_sensor_t sensor0;
-static angle_sensor_t sensor1;
+static angle_sensor_t m_sensor[NUM_SENSORS];
+static double m_sensor_buffer0[FILTER_LEN];
+static double m_sensor_buffer1[FILTER_LEN];
+
 
 /* Public function defintions */
 
 void sensors_init(void) {
-    init_angle_sensor(&sensor0, ADC_CHANNEL0, 
-            angle_sensor_1_characteristic_map);
-    init_angle_sensor(&sensor1, ADC_CHANNEL1, 
-            angle_sensor_2_characteristic_map);
+    init_angle_sensor(&m_sensor[0], ADC_CHANNEL0, 
+            angle_sensor_1_characteristic_map, m_sensor_buffer0);
+
+    init_angle_sensor(&m_sensor[1], ADC_CHANNEL1, 
+            angle_sensor_2_characteristic_map, m_sensor_buffer1);
 }
 
 void sensors_task(void) {
-    angle_sensor_update(&sensor0);
-    angle_sensor_update(&sensor1);
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        angle_sensor_update(&m_sensor[i]);
+    }
+    double combined_angle = combined_angle_sensor_reading(m_sensor);
+    printf("[SENSOR] Combined sensor value %.2f\n\n", combined_angle);
 }
 
 /* Private function defintions */
@@ -53,18 +62,36 @@ void sensors_task(void) {
  *  @note The adc is also initialised, this should not be initialised prior
  */
 static void init_angle_sensor(angle_sensor_t *sensor, adc_channel_id_t 
-        adc_channel, sensor_map_f map) {
+        adc_channel, sensor_map_f map, double* buffer) {
     sensor->adc_channel = adc_channel;
     sensor->map_function = map;
 
-    double sensor_buffer[FILTER_LEN];
-
-    moving_average_filter_init(&(sensor->filter), sensor_buffer, FILTER_LEN);
+    moving_average_filter_init(&(sensor->filter), buffer, FILTER_LEN);
 
     if (adc_init(adc_channel) != ADC_RET_OK){
-        printf("Error: sensor not initialised successfully\n");
+        printf("[SENSOR] Error: sensor not initialised successfully\n");
+        sensor->state = SENSOR_FAULT;
         //TODO trigger error system
     }
+    sensor->state = SENSOR_OK;
+}
+
+/** @brief combines the sensor reading
+ */  
+double combined_angle_sensor_reading(angle_sensor_t *sensors) {
+    int count = 0;
+    double sum = 0;
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        if (sensors[i].state == SENSOR_OK) {
+            //if sensor is OK add filtered value to sum
+            sum += sensors[i].filter.read(&sensors[i].filter);
+            count ++;
+        }
+    }
+    if (count == 0 ) {
+        //No sensors operational. Trigger a critical error!
+    }
+    return sum/count;
 }
 
 /** @brief updates a virtual sensor and feeds the filter
@@ -72,10 +99,10 @@ static void init_angle_sensor(angle_sensor_t *sensor, adc_channel_id_t
  */
 static void angle_sensor_update(angle_sensor_t *sensor) {
     double new_value = read_angle_sensor(sensor);
-    printf("sensor_read %.2f\n", new_value);
+    printf("[SENSOR] sensor_read %.2f\n", new_value);
     sensor->filter.feed(&(sensor->filter), new_value);
     double filtered_value = sensor->filter.read(&sensor->filter);
-    printf("sensor filter read: %f\n", filtered_value);
+    printf("[SENSOR] sensor filter read: %.2f\n", filtered_value);
 }
 
 
@@ -86,7 +113,8 @@ static void angle_sensor_update(angle_sensor_t *sensor) {
 static double read_angle_sensor(angle_sensor_t *sensor) {
     adc_value_t adc_value;
     if (adc_read(sensor->adc_channel, &adc_value) != ADC_RET_OK) {
-        printf("Error: adc read unsuccessful\n");
+        printf("[SENSOR] Error: adc read unsuccessful\n");
+        sensor->state = SENSOR_FAULT;
         //TODO trigger error system
     }
 
@@ -119,7 +147,7 @@ static double angle_sensor_2_characteristic_map(double voltage) {
 static double read_adc_voltage(adc_value_t adc, uint16_t adc_max, 
         double voltage_range) {
     if (adc > adc_max) {
-        printf("Error ADC out of bounds\n");
+        printf("[SENSOR] Error ADC out of bounds\n");
         //TODO: trigger error system here
     }
     return adc*voltage_range/adc_max;

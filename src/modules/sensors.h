@@ -8,6 +8,12 @@
 #include "../drivers/adc_driver/adc_driver.h"
 #include "moving_average.h"
 
+typedef enum {
+    SENSOR_NOT_INITIALISED = 0,
+    SENSOR_OK,
+    SENSOR_FAULT
+} sensor_state_t; 
+
 /* @brief A simple double->double map
  */
 typedef double (*sensor_map_f)(double);
@@ -17,6 +23,7 @@ typedef double (*sensor_map_f)(double);
 typedef struct angle_sensor {
     adc_channel_id_t adc_channel;
     sensor_map_f map_function;
+    sensor_state_t state;
     filter_t filter;
 }angle_sensor_t;
 
@@ -24,7 +31,7 @@ typedef struct angle_sensor {
  */
 void sensors_init(void);
 
-/** @brief reads the angular sensors and combines the value
+/** @brief reads the angular sensors and combines the values
  */
 void sensors_task(void);
 
