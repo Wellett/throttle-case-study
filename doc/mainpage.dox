@@ -3,10 +3,9 @@
 
 @section design Design explanation
 
-Describe what you did here.
 
-There is no need to repeat the description for what it should do that you have
-received again here.
+  ![throttle response block diagram](doc/pipeline_block_diagram.png)
+
 
 <!-- If you know plantUML and you have it installed (maybe adapt PLANTUML_JAR_PATH
   in Doxyfile if it's not at `/usr/share/plantuml`) then you can use this:
@@ -21,6 +20,10 @@ received again here.
 
 @section remarks Remarks and suggestions
 
-Any remarks, suggestions or things that you like to point out?
+Recommendation to the systems team: for true redundancy I recommend using 3 angular sensors. 3 
+sensors allows for easy error detection, (and identifiection of the faulty sensor) for a greature 
+range of failure modes.
+
+A more general approach to this problem might should allow for multiple cascaded maps.
 
 */
