@@ -1,3 +1,4 @@
+#pragma once 
 /** @file
  *  @brief header file for a moving average filter (digital low pass)
  *  Note: if more filter types were introduced the filter type would be 
