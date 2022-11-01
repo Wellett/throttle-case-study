@@ -6,6 +6,20 @@
 
   ![throttle response block diagram](doc/pipeline_block_diagram.png)
 
+The above block diagram shows the data pipeline model.
+- Two virtual sensors are configured to map the adc values to angles, with attached filtering
+- The signals are then aggregated to create a combined throttle position
+- If either sensor is faulty an error shall be raised and the signal aggregation will use only the 
+value from the working sensor.
+
+Since equations are not provided for the mapping from throttle position and speed to torque 
+reference value, a 2D linear interpolation will be used. 
+- the linear interpolation will refernce a 2D throttle map 
+    - This map will be saved to flasha saving ram
+    - This pattern should allow for switching out the active throttle map
+        - This allows for different driving modes (economy, performance, etc)
+        - This also facillitates easy vehicle tuning
+
 
 <!-- If you know plantUML and you have it installed (maybe adapt PLANTUML_JAR_PATH
   in Doxyfile if it's not at `/usr/share/plantuml`) then you can use this:
@@ -18,7 +32,7 @@
   ![Some image](doc/a.png)
 -->
 
-@Assumptions 
+@section assumptions Assumptions 
 - The microcontrollers are assumed to operate over a 5V range. Since the adc driver actually outputs 
 the 10-bit adc value, a voltage range must be assumed to calculate the voltage read. This is 
 parameterised by ADC_VOLTAGE
@@ -31,7 +45,7 @@ sensors allows for easy error detection, (and identifiection of the faulty senso
 range of failure modes.
 
 A more general approach to this problem might should allow for multiple cascaded maps, as the 
-throttle response will likely be scaled by more values than just speed.
+throttle response should may also be scaled by other factors (e.g. Battery SoC);
 
 
 
